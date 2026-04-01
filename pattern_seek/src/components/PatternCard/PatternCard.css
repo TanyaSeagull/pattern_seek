@@ -1,0 +1,78 @@
+.patterns-grid {
+  display: grid;
+  /* Автоматически подстраиваем количество колонок под ширину экрана */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px; /* Отступы между карточками */
+  padding: 20px 0;
+}
+
+/* Стили для самой карточки */
+.pattern-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden; /* Чтобы картинка не вылезала за скругленные углы */
+  transition: transform 0.2s, box-shadow 0.2s; /* Анимация при наведении */
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Эффект при наведении мышки на карточку */
+.pattern-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Стили для картинки */
+.pattern-card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover; /* Картинка будет красиво заполнять область */
+}
+
+/* Стили для блока с текстом внутри карточки */
+.pattern-card-info {
+  padding: 15px;
+  flex-grow: 1; /* Чтобы кнопки всегда были внизу, если текст разной длины */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pattern-card-title {
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* Блок с размером и категорией */
+.pattern-card-meta {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+/* Табличка с категорией */
+.pattern-category-tag {
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: capitalize;
+}
+
+/* Стили для нашей главной кнопки/ссылки */
+.pattern-card-button {
+  display: block;
+  text-align: center;
+  background-color: #007bff; /* Красивый синий цвет */
+  color: white;
+  text-decoration: none; /* Убираем подчеркивание */
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.pattern-card-button:hover {
+  background-color: #0056b3; /* Чуть темнее при наведении */
+}
