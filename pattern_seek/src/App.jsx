@@ -1,69 +1,72 @@
 import { useState } from 'react';
 import { patternsData } from './mockData';
+import PatternCard from './components/PatternCard/PatternCard';
 import './App.css';
 
-import PatternCard from './components/PatternCard/PatternCard';
-
 function App() {
-  // 1. Создаем состояния для наших фильтров. По умолчанию стоит 'all' (показывать всё)
+  // Состояния для трех фильтров
+  const [selectedGender, setSelectedGender] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSize, setSelectedSize] = useState('all');
 
-  // 2. Фильтруем наш массив данных перед тем, как его отрисовать
+  // Умная фильтрация
   const filteredPatterns = patternsData.filter((pattern) => {
-    // Проверяем категорию: если выбрано 'all' ИЛИ категория совпадает с выбранной
-    const isCategoryMatch = selectedCategory === 'all' || pattern.category === selectedCategory;
+    const genderMatch = selectedGender === 'all' || pattern.gender === selectedGender;
+    const categoryMatch = selectedCategory === 'all' || pattern.category === selectedCategory;
     
-    // Проверяем размер. pattern.size у нас число, а из select приходит строка, поэтому приводим к строке
-    const isSizeMatch = selectedSize === 'all' || pattern.size.toString() === selectedSize;
+    // Проверка размера: так как в данных теперь массив [42, 44], 
+    // мы проверяем, есть ли выбранный размер внутри этого массива
+    const sizeMatch = selectedSize === 'all' || 
+                      pattern.sizes.map(String).includes(selectedSize);
 
-    // Оставляем только те лекала, которые прошли обе проверки
-    return isCategoryMatch && isSizeMatch;
+    return genderMatch && categoryMatch && sizeMatch;
   });
 
+  // Получаем список всех уникальных размеров из всех лекал для выпадающего списка
+  // Это "продвинутый" уровень: фильтр сам подстроится под твои данные в mockData
+  const allSizes = [...new Set(patternsData.flatMap(p => p.sizes))].sort((a, b) => a - b);
+
   return (
-    <div>
-      <h1>Бесплатные лекала</h1>
+    <div className="app-container">
+      <h1>Pattern Aggregator</h1>
 
-      {/* 3. Блок с выпадающими списками */}
-      <div style={{ marginBottom: '20px' }}>
-        <label>
-          Категория:
-          <select 
-            value={selectedCategory} 
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="all">Все</option>
-            <option value="pants">Брюки</option>
-            <option value="skirts">Юбки</option>
-            <option value="dresses">Платья</option>
-          </select>
-        </label>
+      <div className="filters-container">
+        {/* Фильтр по полу */}
+        <select value={selectedGender} onChange={(e) => setSelectedGender(e.target.value)}>
+          <option value="all">Кому (Все)</option>
+          <option value="women">Женщинам</option>
+          <option value="men">Мужчинам</option>
+          <option value="kids">Детям</option>
+        </select>
 
-        <label style={{ marginLeft: '20px' }}>
-          Размер:
-          <select 
-            value={selectedSize} 
-            onChange={(e) => setSelectedSize(e.target.value)}
-          >
-            <option value="all">Все</option>
-            <option value="42">42</option>
-            <option value="44">44</option>
-          </select>
-        </label>
+        {/* Фильтр по категории */}
+        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+          <option value="all">Что шьем (Все)</option>
+          <option value="dresses">Платья</option>
+          <option value="pants">Брюки</option>
+          <option value="t-shirts">Футболки</option>
+        </select>
+
+        {/* Динамический фильтр по размеру */}
+        <select value={selectedSize} onChange={(e) => setSelectedSize(e.target.value)}>
+          <option value="all">Размер (Все)</option>
+          {allSizes.map(size => (
+            <option key={size} value={size}>{size}</option>
+          ))}
+        </select>
       </div>
 
-      {/* 4. Выводим отфильтрованный список (или сообщение, если ничего не найдено) */}
-      {filteredPatterns.length > 0 ? (
-        <div className="patterns-grid">
-          {filteredPatterns.map((pattern) => (
-            // Мы передаем данные конкретного лекала в проп pattern
+      <div className="patterns-grid">
+        {filteredPatterns.length > 0 ? (
+          filteredPatterns.map((pattern) => (
             <PatternCard key={pattern.id} pattern={pattern} />
-          ))}
-        </div>
-      ) : (
-        <p>Увы, лекал с такими параметрами пока нет.</p>
-      )}
+          ))
+        ) : (
+          <div className="no-results">
+            <p>Ничего не нашлось. Попробуйте поменять фильтры!</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
