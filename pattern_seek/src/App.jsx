@@ -1,13 +1,28 @@
-import { useState } from 'react';
-import { patternsData } from './mockData';
+import { useState, useEffect } from 'react';
 import PatternCard from './components/PatternCard/PatternCard';
 import './App.css';
 
 function App() {
+  // Данные хранятся в состоянии. Сначала тут пустой массив []
+  const [patterns, setPatterns] = useState([]);
   // Состояния для трех фильтров
   const [selectedGender, setSelectedGender] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSize, setSelectedSize] = useState('all');
+
+  useEffect(() => {
+    const fetchPatterns = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/patterns');
+        const data = await response.json();
+        setPatterns(data); // Кладем привезенные данные на "полку"
+      } catch (error) {
+        console.error("Ошибка курьера:", error);
+      }
+    };
+
+    fetchPatterns();
+  }, []); // Пустые скобки [] значат: "сделай это один раз при открытии сайта"
 
   // Умная фильтрация
   const filteredPatterns = patternsData.filter((pattern) => {
@@ -23,7 +38,6 @@ function App() {
   });
 
   // Получаем список всех уникальных размеров из всех лекал для выпадающего списка
-  // Это "продвинутый" уровень: фильтр сам подстроится под твои данные в mockData
   const allSizes = [...new Set(patternsData.flatMap(p => p.sizes))].sort((a, b) => a - b);
 
   return (
@@ -33,23 +47,23 @@ function App() {
       <div className="filters-container">
         {/* Фильтр по полу */}
         <select value={selectedGender} onChange={(e) => setSelectedGender(e.target.value)}>
-          <option value="all">Кому (Все)</option>
-          <option value="women">Женщинам</option>
-          <option value="men">Мужчинам</option>
-          <option value="kids">Детям</option>
+          <option value="all">All</option>
+          <option value="women">Women</option>
+          <option value="men">Men</option>
+          <option value="kids">Kids</option>
         </select>
 
         {/* Фильтр по категории */}
         <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-          <option value="all">Что шьем (Все)</option>
-          <option value="dresses">Платья</option>
-          <option value="pants">Брюки</option>
-          <option value="t-shirts">Футболки</option>
+          <option value="all">All</option>
+          <option value="dresses">Dresses</option>
+          <option value="pants">Pants</option>
+          <option value="t-shirts">Shirts</option>
         </select>
 
         {/* Динамический фильтр по размеру */}
         <select value={selectedSize} onChange={(e) => setSelectedSize(e.target.value)}>
-          <option value="all">Размер (Все)</option>
+          <option value="all">Size (all)</option>
           {allSizes.map(size => (
             <option key={size} value={size}>{size}</option>
           ))}
@@ -63,7 +77,7 @@ function App() {
           ))
         ) : (
           <div className="no-results">
-            <p>Ничего не нашлось. Попробуйте поменять фильтры!</p>
+            <p>Didn't find anything. Sorry !</p>
           </div>
         )}
       </div>
